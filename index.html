@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Custom Google Clone</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    
+    body {
+      font-family: Arial, sans-serif;
+      margin-top: 200px;
+      text-align: center;
+      background-color: white;
+      transition: background-color 0.3s, color 0.3s;
+    }
+
+    .dark-mode {
+      background-color: #121212;
+      color: white;
+    }
+
+    .logo {
+      margin-top: 80px;
+      font-size: 80px;
+      font-weight: bold;
+      font-family: Arial, sans-serif;
+    }
+
+    .logo span:nth-child(1) { color: #4285F4; }
+    .logo span:nth-child(2) { color: #DB4437; }
+    .logo span:nth-child(3) { color: #F4B400; }
+    .logo span:nth-child(4) { color: #4285F4; }
+    .logo span:nth-child(5) { color: #0F9D58; }
+    .logo span:nth-child(6) { color: #DB4437; }
+
+    .search-container {
+      margin-top: 20px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .search-box {
+      width: 50%;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 24px;
+      border: 1px solid #ccc;
+      outline: none;
+    }
+
+    button, .icon-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      padding: 8px;
+    }
+
+    .menu-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      font-size: 22px;
+      background: none;
+      border: none;
+      cursor: pointer;
+    }
+
+    .menu-content {
+        display: none;
+        position: absolute;
+        top: 40px;
+        right: 10px;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        padding: 10px;
+        border-radius: 8px;
+        box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        z-index: 100;
+        width: 220px; /* You can adjust this width as needed */
+    }
+
+    .menu-content input[type="text"] {
+        width: 100%;
+        padding: 8px 10px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        box-sizing: border-box;
+    }
+
+
+    .dark-mode .menu-content {
+      background-color: #333;
+      color: white;
+    }
+
+    .lens-btn img {
+      width: 20px;
+      height: 20px;
+    }
+
+    .dark-toggle {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+    }
+
+    .suggestions {
+      max-height: 150px;
+      overflow-y: auto;
+      width: 90%;
+      max-width: 600px;
+      margin-top: 5px;
+      border: 1px solid #ccc;
+      border-radius: 5px;
+      background: white;
+    }
+
+    .suggestions div {
+      padding: 8px 10px;
+      cursor: pointer;
+    }
+
+    .suggestions div:hover {
+      background: #eee;
+    }
+
+    .footer-note {
+      margin-top: 20px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    @media (max-width: 480px) {
+      .logo {
+        font-size: 2.5rem;
+      }
+
+      .search-container {
+        padding: 8px 10px;
+      }
+
+      .search-container img {
+        width: 20px;
+        height: 20px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Dark Mode Toggle -->
+  <button class="dark-toggle" onclick="toggleDark()">🌓</button>
+
+  <!-- 3-dot Menu -->
+  <button class="menu-btn" onclick="toggleMenu()">⋮</button>
+  <div class="menu-content" id="menu">
+    <label>Edit Doodle Name:</label><br />
+    <input type="text" id="doodleInput" placeholder="Enter doodle name" oninput="updateDoodle()" />
+  </div>
+
+  <!-- Logo -->
+  <div class="logo" id="logo">
+    <span>G</span><span>o</span><span>o</span><span>g</span><span>l</span><span>e</span>
+  </div>
+
+  <!-- Search Bar -->
+    <div class="search-container" id="searchContainer">
+        <input type="text" id="search" class="search-box" placeholder="Search Google or type a URL" />
+        
+        <button type="button" onclick="startVoice()">🎤</button>
+        
+        <a href="https://images.google.com" target="_blank" class="lens-btn" title="Reverse Image Search">
+            <img src="Google_Lens_Icon.svg.png" alt="Lens" />
+        </a>
+        
+        <button type="button" onclick="searchGoogle(event)">🔍</button>
+    </div>
+    <div class="suggestions" id="suggestionBox"></div>
+
+  <!-- Footer -->
+  <div class="footer-note">
+    <p>Built by Aditya | Not affiliated with Google</p>
+  </div>
+
+  <script>
+    function searchGoogle(e) {
+      e.preventDefault();
+      const query = document.getElementById("search").value.trim();
+      if (query) {
+        window.open("https://www.google.com/search?q=" + encodeURIComponent(query), "_blank");
+      }
+    }
+
+    function startVoice() {
+      const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+      recognition.lang = 'en-US';
+      recognition.start();
+
+      recognition.onresult = function(event) {
+        const result = event.results[0][0].transcript;
+        document.getElementById("search").value = result;
+      };
+
+      recognition.onerror = function() {
+        alert("Mic access denied or not supported.");
+      };
+    }
+
+    function toggleDark() {
+      document.body.classList.toggle('dark-mode');
+    }
+
+    function toggleMenu() {
+      const menu = document.getElementById("menu");
+      menu.style.display = (menu.style.display === "block") ? "none" : "block";
+    }
+
+    function updateDoodle() {
+      const val = document.getElementById("doodleInput").value || "Google";
+      const logo = document.getElementById("logo");
+      const colors = ["#4285F4", "#DB4437", "#F4B400", "#4285F4", "#0F9D58", "#DB4437"];
+      logo.innerHTML = [...val].map((ch, i) =>
+        `<span style="color:${colors[i % colors.length]}">${ch}</span>`
+      ).join("");
+    }
+
+    function fetchSuggestions() {
+      const query = document.getElementById("searchInput").value;
+      const box = document.getElementById("suggestionBox");
+      if (!query.trim()) return box.innerHTML = '';
+
+      fetch(`https://suggestqueries.google.com/complete/search?client=firefox&q=${encodeURIComponent(query)}`)
+        .then(res => res.json())
+        .then(data => {
+          box.innerHTML = data[1].map(s =>
+            `<div onclick="useSuggestion('${s}')">${s}</div>`
+          ).join("");
+        });
+    }
+
+    function useSuggestion(val) {
+      document.getElementById("searchInput").value = val;
+      searchGoogle();
+    }
+  </script>
+
+</body>
+</html>
